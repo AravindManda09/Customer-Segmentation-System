@@ -1,0 +1,27 @@
+# File paths
+data:
+  raw_path: "data/raw/transactions.csv"
+  processed_path: "data/processed/rfm_data.csv"
+  model_path: "models/kmeans_model.pkl"
+
+# Data Generation Parameters
+data_generation:
+  n_rows: 1000
+  n_customers: 100
+  random_state: 42
+
+# RFM Parameters
+rfm:
+  recency_col: "Recency"
+  frequency_col: "Frequency"
+  monetary_col: "Monetary"
+
+# Model Parameters
+model:
+  n_clusters: 4
+  n_init: 10
+  random_state: 42
+
+# Visualization
+visualization:
+  theme: "plotly_dark"
