@@ -42,18 +42,46 @@ def generate_transactions(n_rows=1000, n_customers=100, random_state=42):
     logger.info("Data generation complete.")
     return df
 
-def load_data(file_path):
+def load_data(file_source):
     """
-    Loads data from a CSV file.
+    Loads data from a CSV file path or buffer. 
+    Handles comma/tab separators and ensures data is loaded generically.
     """
-    logger.info(f"Loading data from {file_path}")
-    if not os.path.exists(file_path):
-        logger.error(f"File not found: {file_path}")
-        raise FileNotFoundError(f"File not found: {file_path}")
+    logger.info(f"Loading data...")
+    
+    # Check string path
+    if isinstance(file_source, str):
+        if not os.path.exists(file_source):
+            logger.error(f"File not found: {file_source}")
+            raise FileNotFoundError(f"File not found: {file_source}")
+    
+    try:
+        # 1. Try default load (comma)
+        if hasattr(file_source, 'seek'): file_source.seek(0)
+        df = pd.read_csv(file_source)
         
-    df = pd.read_csv(file_path)
-    logger.info(f"Loaded {len(df)} rows.")
-    return df
+        # 2. Check for single column (likely wrong separator)
+        if len(df.columns) == 1:
+            logger.info("Single column detected. Trying tab separator...")
+            if hasattr(file_source, 'seek'): file_source.seek(0)
+            try:
+                df_tab = pd.read_csv(file_source, sep='\\t')
+                if len(df_tab.columns) > 1:
+                    df = df_tab
+            except Exception:
+                pass
+        
+        # 3. Check for obvious headerless data where the first row is purely numeric/date
+        # If the first column's name looks like a number or ID instead of a feature name
+        # We can optionally drop down to header=None, but generally we will assume 
+        # the user uploaded a CSV with headers. We no longer force ['CustomerID', 'TransactionDate', 'Amount', 'OrderID'].
+        
+        logger.info(f"Loaded {len(df)} rows with columns: {list(df.columns)}")
+        return df
+        
+    except Exception as e:
+        logger.error(f"Error loading data: {e}")
+        raise
 
 def save_data(df, file_path):
     """

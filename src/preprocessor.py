@@ -11,14 +11,9 @@ def calculate_rfm(df, config=None):
     logger.info("Calculating RFM metrics...")
     
     # Use config if provided, else defaults
-    cust_col = 'CustomerID'
-    date_col = 'TransactionDate'
-    amt_col = 'Amount'
-    
-    if config:
-        # If column names were in config, we'd use them here. 
-        # For now, assuming standard names based on generation.
-        pass
+    cust_col = config.get('cust_col', 'CustomerID') if config else 'CustomerID'
+    date_col = config.get('date_col', 'TransactionDate') if config else 'TransactionDate'
+    amt_col = config.get('amt_col', 'Amount') if config else 'Amount'
 
     try:
         df[date_col] = pd.to_datetime(df[date_col])
