@@ -34,6 +34,10 @@ class KMeansModel:
             
     def evaluate(self, rfm_df, labels):
         logger.info("Evaluating model...")
+        # sanity checks
+        if len(rfm_df) != len(labels):
+            logger.error(f"Mismatched lengths rfm_df={len(rfm_df)} labels={len(labels)}")
+            raise ValueError(f"Number of samples in rfm_df ({len(rfm_df)}) does not match labels ({len(labels)})")
         if len(set(labels)) < 2:
             return 0.0
             

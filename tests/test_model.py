@@ -25,3 +25,13 @@ def test_kmeans_evaluation(sample_rfm):
     
     # Silhouette score is between -1 and 1
     assert -1 <= score <= 1
+
+
+def test_evaluate_length_mismatch(sample_rfm):
+    model = KMeansModel(n_clusters=2)
+    rfm_df, labels = model.train(sample_rfm)
+    # drop one label to simulate mismatch
+    truncated = labels[:-1]
+    with pytest.raises(ValueError) as excinfo:
+        model.evaluate(rfm_df, truncated)
+    assert "does not match labels" in str(excinfo.value)
