@@ -33,9 +33,9 @@ try:
             df = st.session_state['df']
             
     elif data_source == "Upload CSV":
-        uploaded_file = st.sidebar.file_uploader("Upload your transaction CSV", type=["csv"])
+        uploaded_file = st.sidebar.file_uploader("Upload your transaction CSV", type=["csv", "tsv", "txt"])
         if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
+            df = load_data(uploaded_file)
             st.session_state['df'] = df
             logger.info("Data uploaded via UI.")
 

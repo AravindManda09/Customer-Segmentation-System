@@ -56,16 +56,23 @@ def load_data(file_source):
             raise FileNotFoundError(f"File not found: {file_source}")
     
     try:
-        # 1. Try default load (comma)
+        encoding_used = 'utf-8'
+        # 1. Try default load (comma) with UTF-8
         if hasattr(file_source, 'seek'): file_source.seek(0)
-        df = pd.read_csv(file_source)
-        
+        try:
+            df = pd.read_csv(file_source)
+        except UnicodeDecodeError:
+            logger.info("UTF-8 decoding failed. Trying UTF-16...")
+            if hasattr(file_source, 'seek'): file_source.seek(0)
+            df = pd.read_csv(file_source, encoding='utf-16')
+            encoding_used = 'utf-16'
+            
         # 2. Check for single column (likely wrong separator)
         if len(df.columns) == 1:
             logger.info("Single column detected. Trying tab separator...")
             if hasattr(file_source, 'seek'): file_source.seek(0)
             try:
-                df_tab = pd.read_csv(file_source, sep='\\t')
+                df_tab = pd.read_csv(file_source, sep='\\t', encoding=encoding_used)
                 if len(df_tab.columns) > 1:
                     df = df_tab
             except Exception:
