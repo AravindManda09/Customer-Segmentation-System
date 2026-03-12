@@ -19,7 +19,9 @@ def plot_rfm_distribution(rfm_df):
 def plot_3d_clusters(rfm_df):
     try:
         logger.info("Plotting 3D Clusters...")
-        fig = px.scatter_3d(rfm_df, x='Recency', y='Frequency', z='Monetary',
+        plot_df = rfm_df.copy()
+        plot_df['Cluster'] = plot_df['Cluster'].astype(str)
+        fig = px.scatter_3d(plot_df, x='Recency', y='Frequency', z='Monetary',
                             color='Cluster', title='3D Cluster Visualization',
                             opacity=0.7, symbol='Cluster')
         return fig
